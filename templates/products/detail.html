@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block title %}{{ product.brand }} {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+
+        <!-- Product Header -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                    <div>
+                        <nav aria-label="breadcrumb" class="mb-2">
+                            <ol class="breadcrumb small">
+                                <li class="breadcrumb-item"><a href="{% url 'search' %}">Search</a></li>
+                                <li class="breadcrumb-item active">{{ product.name }}</li>
+                            </ol>
+                        </nav>
+                        <h4 class="fw-bold mb-1">{{ product.brand }} {{ product.name }}</h4>
+                        <span class="badge bg-secondary">{{ product.category }}</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'product_edit' product.pk %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        <a href="{% url 'product_move' product.pk %}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-arrow-left-right"></i> Move
+                        </a>
+                        <a href="{% url 'product_delete' product.pk %}" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Location Display — Primary Info -->
+                <div class="location-hero mt-4 p-4 rounded-3 bg-dark text-white">
+                    <div class="row text-center g-3">
+                        <div class="col-6">
+                            <div class="location-block">
+                                <i class="bi bi-grid-3x3 text-warning d-block" style="font-size:2rem;"></i>
+                                <div class="small text-muted mt-1">Rack</div>
+                                <div class="display-6 fw-bold text-warning">
+                                    {{ product.rack.name|default:"—" }}
+                                </div>
+                                {% if product.rack.category %}
+                                <small class="text-muted">{{ product.rack.category }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="location-block">
+                                <i class="bi bi-layers text-info d-block" style="font-size:2rem;"></i>
+                                <div class="small text-muted mt-1">Shelf</div>
+                                <div class="display-6 fw-bold text-info">
+                                    {{ product.shelf.code|default:"—" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock -->
+                <div class="row g-3 mt-3">
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-2 {% if product.stock_status == 'out' %}bg-danger-subtle{% elif product.stock_status == 'low' %}bg-warning-subtle{% else %}bg-success-subtle{% endif %}">
+                            <div class="small text-muted">Quantity in Stock</div>
+                            <div class="h3 fw-bold mb-0 {% if product.stock_status == 'out' %}text-danger{% elif product.stock_status == 'low' %}text-warning{% else %}text-success{% endif %}">
+                                {{ product.quantity }}
+                                {% if product.stock_status == 'out' %}
+                                <small class="fs-6">— Out of Stock</small>
+                                {% elif product.stock_status == 'low' %}
+                                <small class="fs-6">— Low Stock</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Quick quantity update -->
+                        <form action="{% url 'update_quantity' product.pk %}" method="post" class="d-flex gap-2 align-items-end h-100">
+                            {% csrf_token %}
+                            <div class="flex-grow-1">
+                                <label class="form-label small text-muted mb-1">Update Quantity</label>
+                                {{ qty_form.quantity }}
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg"></i> Update
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                {% if product.notes %}
+                <div class="mt-3 p-3 bg-light rounded-2">
+                    <small class="text-muted d-block mb-1"><i class="bi bi-sticky"></i> Notes</small>
+                    {{ product.notes }}
+                </div>
+                {% endif %}
+
+                <div class="mt-3 text-muted small">
+                    Added {{ product.created_at|date:"d M Y" }} &nbsp;·&nbsp;
+                    Updated {{ product.updated_at|timesince }} ago
+                </div>
+            </div>
+        </div>
+
+        <!-- Movement History for this product -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold mb-0"><i class="bi bi-clock-history"></i> Movement History</h6>
+                <a href="{% url 'product_move' product.pk %}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-arrow-left-right"></i> Move Product
+                </a>
+            </div>
+            {% if movements %}
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Notes</th>
+                            <th>Moved By</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in movements %}
+                        <tr>
+                            <td>
+                                {% if m.from_rack %}
+                                <span class="badge bg-secondary">{{ m.from_rack }}{% if m.from_shelf %} / {{ m.from_shelf }}{% endif %}</span>
+                                {% else %}<span class="text-muted">—</span>{% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-success">{{ m.to_rack }}{% if m.to_shelf %} / {{ m.to_shelf }}{% endif %}</span>
+                            </td>
+                            <td><small class="text-muted">{{ m.notes|default:"—" }}</small></td>
+                            <td><small>{{ m.moved_by.username|default:"—" }}</small></td>
+                            <td><small class="text-muted">{{ m.moved_at|date:"d M Y H:i" }}</small></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="card-body text-center text-muted py-4">
+                <i class="bi bi-clock"></i> No movements recorded.
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4 mt-4 mt-lg-0">
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-dark text-white">
+                <small class="text-muted">LOCATION</small>
+            </div>
+            <div class="card-body text-center">
+                <div class="location-map p-3">
+                    {% if product.rack %}
+                    <div class="rack-visual">
+                        <div class="rack-name-big">Rack {{ product.rack.name }}</div>
+                        {% if product.rack.category %}
+                        <small class="text-muted">{{ product.rack.category }}</small>
+                        {% endif %}
+                        <div class="shelf-list mt-3">
+                            {% for shelf in product.rack.shelves.all %}
+                            <div class="shelf-row {% if shelf == product.shelf %}active-shelf{% endif %}">
+                                <i class="bi bi-{% if shelf == product.shelf %}arrow-right-circle-fill text-warning{% else %}dash{% endif %}"></i>
+                                {{ shelf.code }}
+                                {% if shelf == product.shelf %}
+                                <span class="badge bg-warning text-dark ms-1">HERE</span>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-muted py-3">
+                        <i class="bi bi-geo-alt" style="font-size:2rem;"></i>
+                        <p class="mt-2 small">No location assigned</p>
+                        <a href="{% url 'product_edit' product.pk %}" class="btn btn-sm btn-primary">Assign Location</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2">
+            <a href="{% url 'product_move' product.pk %}" class="btn btn-warning">
+                <i class="bi bi-arrow-left-right"></i> Move to Another Shelf
+            </a>
+            <a href="{% url 'product_edit' product.pk %}" class="btn btn-outline-primary">
+                <i class="bi bi-pencil"></i> Edit Product Details
+            </a>
+            <a href="{% url 'search' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-search"></i> Back to Search
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

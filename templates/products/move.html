@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Move {{ product.brand }} {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb small">
+                        <li class="breadcrumb-item"><a href="{% url 'product_detail' product.pk %}">{{ product.name }}</a></li>
+                        <li class="breadcrumb-item active">Move Product</li>
+                    </ol>
+                </nav>
+
+                <h5 class="fw-bold mb-1">
+                    <i class="bi bi-arrow-left-right text-warning"></i>
+                    Move Product
+                </h5>
+                <p class="text-muted">{{ product.brand }} {{ product.name }}</p>
+
+                <!-- Current location -->
+                <div class="p-3 bg-light rounded-2 mb-4">
+                    <small class="text-muted d-block mb-1">Current Location</small>
+                    {% if product.rack %}
+                    <span class="fw-bold fs-5">Rack {{ product.rack.name }}</span>
+                    {% if product.shelf %}
+                    <i class="bi bi-arrow-right mx-2 text-muted"></i>
+                    <span class="fw-bold fs-5">Shelf {{ product.shelf.code }}</span>
+                    {% endif %}
+                    {% else %}
+                    <span class="text-muted">No location assigned</span>
+                    {% endif %}
+                </div>
+
+                <form method="post" id="moveForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-grid text-primary"></i> New Rack <span class="text-danger">*</span>
+                        </label>
+                        {{ form.new_rack }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-layers text-info"></i> New Shelf
+                        </label>
+                        {{ form.new_shelf }}
+                        <small class="text-muted">Select a rack first</small>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Reason / Notes</label>
+                        {{ form.notes }}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning btn-lg px-5">
+                            <i class="bi bi-arrow-left-right"></i> Confirm Move
+                        </button>
+                        <a href="{% url 'product_detail' product.pk %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const rackSelect = document.getElementById('id_new_rack');
+const shelfSelect = document.getElementById('id_new_shelf');
+
+rackSelect.addEventListener('change', function() {
+    const rackId = this.value;
+    shelfSelect.innerHTML = '<option value="">Loading...</option>';
+    shelfSelect.disabled = true;
+
+    if (!rackId) {
+        shelfSelect.innerHTML = '<option value="">— Select Shelf —</option>';
+        shelfSelect.disabled = false;
+        return;
+    }
+
+    fetch(`/racks/api/shelves/${rackId}/`)
+        .then(r => r.json())
+        .then(data => {
+            shelfSelect.innerHTML = '<option value="">— Select Shelf —</option>';
+            data.shelves.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.code;
+                shelfSelect.appendChild(opt);
+            });
+            shelfSelect.disabled = false;
+        });
+});
+</script>
+{% endblock %}

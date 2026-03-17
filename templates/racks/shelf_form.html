@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb small">
+                        <li class="breadcrumb-item"><a href="{% url 'rack_list' %}">Racks</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'shelf_list' %}">Shelves</a></li>
+                        <li class="breadcrumb-item active">{{ title }}</li>
+                    </ol>
+                </nav>
+                <h5 class="fw-bold mb-4">{{ title }}</h5>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Rack <span class="text-danger">*</span></label>
+                        {{ form.rack }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Shelf Code <span class="text-danger">*</span></label>
+                        {{ form.code }}
+                        <small class="text-muted">e.g. A1, A2, B3 — will be auto-uppercased</small>
+                        {% if form.code.errors %}<div class="text-danger small">{{ form.code.errors }}</div>{% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Description</label>
+                        {{ form.description }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <i class="bi bi-check-lg"></i> Save
+                        </button>
+                        <a href="{% url 'shelf_list' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

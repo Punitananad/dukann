@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb small">
+                        <li class="breadcrumb-item"><a href="{% url 'search' %}">Products</a></li>
+                        {% if product %}
+                        <li class="breadcrumb-item"><a href="{% url 'product_detail' product.pk %}">{{ product.brand }} {{ product.name }}</a></li>
+                        {% endif %}
+                        <li class="breadcrumb-item active">{{ title }}</li>
+                    </ol>
+                </nav>
+                <h5 class="fw-bold">{{ title }}</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" id="productForm">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">Product Name <span class="text-danger">*</span></label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                            <div class="text-danger small">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Brand <span class="text-danger">*</span></label>
+                            {{ form.brand }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-grid text-primary"></i> Rack
+                            </label>
+                            {{ form.rack }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-layers text-info"></i> Shelf
+                            </label>
+                            {{ form.shelf }}
+                            <small class="text-muted">Select a rack first</small>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Notes</label>
+                            {{ form.notes }}
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <div class="d-flex gap-2 align-items-center">
+                        <button type="submit" class="btn btn-lg px-5 fw-bold add-product-btn">
+                            <i class="bi bi-plus-circle-fill me-2"></i>
+                            {% if product %}Save Changes{% else %}Add Product{% endif %}
+                        </button>
+                        {% if product %}
+                        <a href="{% url 'product_detail' product.pk %}" class="btn btn-outline-secondary btn-lg px-4">Cancel</a>
+                        {% else %}
+                        <a href="{% url 'search' %}" class="btn btn-outline-secondary btn-lg px-4">Cancel</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const rackSelect = document.getElementById('id_rack');
+const shelfSelect = document.getElementById('id_shelf');
+
+rackSelect.addEventListener('change', function() {
+    const rackId = this.value;
+    shelfSelect.innerHTML = '<option value="">Loading...</option>';
+    shelfSelect.disabled = true;
+
+    if (!rackId) {
+        shelfSelect.innerHTML = '<option value="">— Select Rack First —</option>';
+        shelfSelect.disabled = false;
+        return;
+    }
+
+    fetch(`/racks/api/shelves/${rackId}/`)
+        .then(r => r.json())
+        .then(data => {
+            shelfSelect.innerHTML = '<option value="">— Select Shelf —</option>';
+            data.shelves.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.code;
+                shelfSelect.appendChild(opt);
+            });
+            shelfSelect.disabled = false;
+        });
+});
+</script>
+{% endblock %}

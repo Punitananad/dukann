@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Delete Shelf {{ shelf.code }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center p-5">
+                <i class="bi bi-trash text-danger" style="font-size:3rem;"></i>
+                <h5 class="fw-bold mt-3">Delete Shelf {{ shelf.code }}?</h5>
+                <p class="text-muted">
+                    This will delete shelf <strong>{{ shelf.code }}</strong> from Rack <strong>{{ shelf.rack.name }}</strong>.
+                    <br><br>
+                    <span class="text-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {{ shelf.product_count }} product{{ shelf.product_count|pluralize }} on this shelf will lose their shelf location.
+                    </span>
+                </p>
+                <div class="d-flex gap-2 justify-content-center mt-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-lg px-4">
+                            <i class="bi bi-trash"></i> Yes, Delete
+                        </button>
+                    </form>
+                    <a href="{% url 'shelf_list' %}" class="btn btn-outline-secondary btn-lg px-4">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,355 @@
+/* ============================================
+   RackFinder — Shop Locator CSS
+   ============================================ */
+
+:root {
+    --primary: #0d6efd;
+    --warning: #ffc107;
+    --rack-bg: #1a1a2e;
+}
+
+body {
+    background-color: #f4f6f9;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ---- Navbar ---- */
+.navbar-brand {
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+}
+
+/* ---- Stat Cards ---- */
+.stat-card {
+    border-radius: 12px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
+}
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    border-radius: 50%;
+}
+.stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #1a1a2e;
+}
+.stat-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+/* ---- Search Hero ---- */
+.search-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+    position: relative;
+}
+
+/* ---- Suggestions Dropdown ---- */
+.suggestions-dropdown {
+    position: absolute;
+    z-index: 1050;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    display: none;
+    width: calc(100% - 80px);
+    left: 0;
+    top: calc(100% - 4px);
+}
+.suggestion-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    text-decoration: none;
+    display: block;
+    color: #212529;
+    transition: background 0.1s;
+}
+.suggestion-item:hover, .suggestion-item:focus {
+    background: #f8f9fa;
+    color: #0d6efd;
+}
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+.suggestion-rack {
+    display: inline-block;
+    background: #1a1a2e;
+    color: #ffc107;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-right: 4px;
+}
+.suggestion-shelf {
+    display: inline-block;
+    background: #0d6efd;
+    color: white;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+/* ---- Result Cards ---- */
+.result-card {
+    border-radius: 10px;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    border: 1px solid #e9ecef !important;
+}
+.result-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important;
+    border-color: #0d6efd !important;
+}
+.product-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+.location-display {
+    font-weight: 600;
+    font-size: 1rem;
+}
+.rack-label {
+    background: #1a1a2e;
+    color: #ffc107;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+.shelf-label {
+    background: #0d6efd;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* ---- Product Detail ---- */
+.location-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+.rack-visual {
+    padding: 10px;
+}
+.rack-name-big {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1a1a2e;
+}
+.shelf-row {
+    padding: 6px 10px;
+    margin: 4px 0;
+    border-radius: 6px;
+    background: #f8f9fa;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+.active-shelf {
+    background: #fff3cd;
+    color: #1a1a2e;
+    font-weight: 700;
+}
+
+/* ---- Rack & Shelf Chips ---- */
+.rack-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: #1a1a2e;
+    color: #ffc107;
+    font-weight: 800;
+    font-size: 1.1rem;
+    border-radius: 8px;
+}
+.rack-badge-lg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    background: #1a1a2e;
+    color: #ffc107;
+    font-weight: 800;
+    font-size: 1.5rem;
+    border-radius: 10px;
+}
+.shelf-chip {
+    display: inline-block;
+    background: #e8f0fe;
+    color: #0d6efd;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #c8d9fc;
+}
+.shelf-chip-lg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f0fe;
+    color: #0d6efd;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    border: 1px solid #c8d9fc;
+}
+
+/* ---- Dashboard Rack Mini Card ---- */
+.rack-mini-card {
+    background: #fafbfc;
+    border-color: #dee2e6 !important;
+    transition: border-color 0.15s;
+}
+.rack-mini-card:hover {
+    border-color: #0d6efd !important;
+}
+
+/* ---- General Cards ---- */
+.card {
+    border-radius: 12px;
+}
+.card-header {
+    border-radius: 12px 12px 0 0 !important;
+}
+
+/* ---- Hover lift ---- */
+.hover-lift {
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.hover-lift:hover {
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   PRINT STYLES — Label Generator
+   ============================================ */
+.labels-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.label-card {
+    border: 2px solid #1a1a2e;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    background: white;
+    page-break-inside: avoid;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.label-rack {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+.label-shelf-code {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #1a1a2e;
+    line-height: 1;
+}
+
+.label-category {
+    font-size: 0.7rem;
+    color: #6c757d;
+    margin-top: 4px;
+}
+
+@media print {
+    body {
+        background: white !important;
+    }
+    .navbar, .d-print-none {
+        display: none !important;
+    }
+    .container-fluid {
+        padding: 0 !important;
+    }
+    .labels-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    .label-card {
+        border: 1.5px solid #000;
+        border-radius: 4px;
+        padding: 12px;
+        min-height: 90px;
+    }
+    .label-shelf-code {
+        font-size: 2rem;
+    }
+}
+
+/* ---- Add Product Button ---- */
+.add-product-btn {
+    background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+    border: none;
+    color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    letter-spacing: 0.3px;
+}
+.add-product-btn:hover {
+    background: linear-gradient(135deg, #0b5ed7 0%, #520dc2 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.45);
+}
+.add-product-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 576px) {
+    .labels-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .stat-number {
+        font-size: 1.5rem;
+    }
+}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Print Labels{% endblock %}
+
+{% block content %}
+<!-- Screen controls (hidden on print) -->
+<div class="d-print-none mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-printer text-secondary"></i> Label Generator
+        </h5>
+        <div class="d-flex gap-2">
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="bi bi-printer"></i> Print Labels
+            </button>
+            <a href="{% url 'rack_list' %}" class="btn btn-outline-secondary">Back</a>
+        </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="mt-3 d-flex gap-2 flex-wrap">
+        <a href="{% url 'label_generator' %}" class="btn btn-sm {% if not rack_id %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+            All Racks
+        </a>
+        {% for rack in racks %}
+        <a href="{% url 'label_generator' %}?rack={{ rack.pk }}"
+           class="btn btn-sm {% if rack_id == rack.pk|stringformat:'s' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            Rack {{ rack.name }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <div class="mt-3 p-3 bg-light rounded-2 small text-muted">
+        <i class="bi bi-info-circle"></i>
+        Select a rack to filter, then click Print. Labels are designed for A4 paper — 4 per row.
+    </div>
+</div>
+
+<!-- Print Title (only shows on print) -->
+<div class="d-none d-print-block mb-3">
+    <h4 class="fw-bold">Rack Labels — Cosmetic Shop</h4>
+    <small>Printed on {% now "d M Y H:i" %}</small>
+    <hr>
+</div>
+
+<!-- Labels Grid -->
+{% for rack in selected_racks %}
+<div class="mb-4">
+    <h6 class="text-muted d-print-none mb-2">
+        <i class="bi bi-grid"></i> Rack {{ rack.name }}
+        {% if rack.category %} — {{ rack.category }}{% endif %}
+    </h6>
+    <div class="labels-grid">
+        {% for shelf in rack.shelves.all %}
+        <div class="label-card">
+            <div class="label-rack">RACK {{ rack.name }}</div>
+            <div class="label-shelf-code">{{ shelf.code }}</div>
+            {% if rack.category %}
+            <div class="label-category">{{ rack.category }}</div>
+            {% endif %}
+            <div class="label-border-bottom"></div>
+        </div>
+        {% empty %}
+        <p class="text-muted small d-print-none">No shelves in Rack {{ rack.name }}</p>
+        {% endfor %}
+    </div>
+</div>
+{% empty %}
+<div class="text-center py-5 text-muted d-print-none">
+    <i class="bi bi-printer" style="font-size:3rem; color:#ccc;"></i>
+    <p class="mt-2">No racks to show. <a href="{% url 'rack_add' %}">Add a rack first</a>.</p>
+</div>
+{% endfor %}
+{% endblock %}

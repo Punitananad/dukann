@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Rack Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="fw-bold mb-0">
+        <i class="bi bi-grid text-primary"></i> Rack Manager
+    </h5>
+    <div class="d-flex gap-2">
+        <a href="{% url 'rack_add' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Add Rack
+        </a>
+        <a href="{% url 'shelf_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-layers"></i> Manage Shelves
+        </a>
+    </div>
+</div>
+
+{% if racks %}
+<div class="row g-3">
+    {% for rack in racks %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <div class="rack-badge-lg">{{ rack.name }}</div>
+                        {% if rack.category %}
+                        <div class="fw-semibold mt-1">{{ rack.category }}</div>
+                        {% endif %}
+                        {% if rack.description %}
+                        <small class="text-muted">{{ rack.description }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'rack_edit' rack.pk %}">
+                                <i class="bi bi-pencil"></i> Edit Rack
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'shelf_list' %}?rack={{ rack.pk }}">
+                                <i class="bi bi-layers"></i> Manage Shelves
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'shelf_add' %}?rack={{ rack.pk }}">
+                                <i class="bi bi-plus"></i> Add Shelf
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'rack_delete' rack.pk %}">
+                                <i class="bi bi-trash"></i> Delete Rack
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Shelves -->
+                <div class="mb-3">
+                    <small class="text-muted fw-semibold">SHELVES</small>
+                    <div class="mt-1 d-flex flex-wrap gap-1">
+                        {% for shelf in rack.shelves.all %}
+                        <span class="shelf-chip-lg" title="{{ shelf.product_count }} products">
+                            {{ shelf.code }}
+                            {% if shelf.product_count > 0 %}
+                            <span class="badge bg-primary ms-1" style="font-size:0.6rem;">{{ shelf.product_count }}</span>
+                            {% endif %}
+                        </span>
+                        {% empty %}
+                        <span class="text-muted small">No shelves yet</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between text-muted small">
+                    <span><i class="bi bi-layers"></i> {{ rack.shelf_count }} shelf{{ rack.shelf_count|pluralize:"ves" }}</span>
+                    <span><i class="bi bi-box-seam"></i> {{ rack.product_count }} product{{ rack.product_count|pluralize }}</span>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 pt-0">
+                <a href="{% url 'shelf_add' %}?rack={{ rack.pk }}" class="btn btn-sm btn-outline-primary w-100">
+                    <i class="bi bi-plus"></i> Add Shelf to {{ rack.name }}
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="bi bi-grid" style="font-size:4rem; color:#ccc;"></i>
+    <h5 class="mt-3 text-muted">No racks yet</h5>
+    <p class="text-muted">Create your first rack to start organizing products</p>
+    <a href="{% url 'rack_add' %}" class="btn btn-primary btn-lg mt-2">
+        <i class="bi bi-plus-circle"></i> Add Your First Rack
+    </a>
+</div>
+{% endif %}
+{% endblock %}
