@@ -22,29 +22,41 @@
                     {% csrf_token %}
 
                     <div class="row g-3">
-                        <div class="col-md-8">
+                        <div class="col-12">
                             <label class="form-label fw-semibold">Product Name <span class="text-danger">*</span></label>
                             {{ form.name }}
                             {% if form.name.errors %}
                             <div class="text-danger small">{{ form.name.errors }}</div>
                             {% endif %}
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Brand <span class="text-danger">*</span></label>
-                            {{ form.brand }}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Category</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Subcategory</label>
+                            {{ form.subcategory }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Tags <small class="text-muted fw-normal">(comma-separated)</small></label>
+                            {{ form.tags }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Search Keywords <small class="text-muted fw-normal">(extra terms)</small></label>
+                            {{ form.search_keywords }}
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">
-                                <i class="bi bi-grid text-primary"></i> Rack
+                                <i class="bi bi-building text-primary"></i> Wall
+                            </label>
+                            {{ form.wall }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-grid-3x3 text-info"></i> Rack
                             </label>
                             {{ form.rack }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">
-                                <i class="bi bi-layers text-info"></i> Shelf
-                            </label>
-                            {{ form.shelf }}
-                            <small class="text-muted">Select a rack first</small>
+                            <small class="text-muted">Select a wall first</small>
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold">Notes</label>
@@ -73,31 +85,31 @@
 
 {% block extra_js %}
 <script>
+const wallSelect = document.getElementById('id_wall');
 const rackSelect = document.getElementById('id_rack');
-const shelfSelect = document.getElementById('id_shelf');
 
-rackSelect.addEventListener('change', function() {
-    const rackId = this.value;
-    shelfSelect.innerHTML = '<option value="">Loading...</option>';
-    shelfSelect.disabled = true;
+wallSelect.addEventListener('change', function() {
+    const wallId = this.value;
+    rackSelect.innerHTML = '<option value="">Loading...</option>';
+    rackSelect.disabled = true;
 
-    if (!rackId) {
-        shelfSelect.innerHTML = '<option value="">— Select Rack First —</option>';
-        shelfSelect.disabled = false;
+    if (!wallId) {
+        rackSelect.innerHTML = '<option value="">— Select Wall First —</option>';
+        rackSelect.disabled = false;
         return;
     }
 
-    fetch(`/racks/api/shelves/${rackId}/`)
+    fetch(`/racks/api/shelves/${wallId}/`)
         .then(r => r.json())
         .then(data => {
-            shelfSelect.innerHTML = '<option value="">— Select Shelf —</option>';
+            rackSelect.innerHTML = '<option value="">— Select Rack —</option>';
             data.shelves.forEach(s => {
                 const opt = document.createElement('option');
                 opt.value = s.id;
                 opt.textContent = s.code;
-                shelfSelect.appendChild(opt);
+                rackSelect.appendChild(opt);
             });
-            shelfSelect.disabled = false;
+            rackSelect.disabled = false;
         });
 });
 </script>

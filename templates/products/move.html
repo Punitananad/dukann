@@ -22,11 +22,11 @@
                 <!-- Current location -->
                 <div class="p-3 bg-light rounded-2 mb-4">
                     <small class="text-muted d-block mb-1">Current Location</small>
+                    {% if product.wall %}
+                    <span class="fw-bold fs-5">Wall {{ product.wall.name }}</span>
                     {% if product.rack %}
-                    <span class="fw-bold fs-5">Rack {{ product.rack.name }}</span>
-                    {% if product.shelf %}
                     <i class="bi bi-arrow-right mx-2 text-muted"></i>
-                    <span class="fw-bold fs-5">Shelf {{ product.shelf.code }}</span>
+                    <span class="fw-bold fs-5">Rack {{ product.rack.code }}</span>
                     {% endif %}
                     {% else %}
                     <span class="text-muted">No location assigned</span>
@@ -37,16 +37,16 @@
                     {% csrf_token %}
                     <div class="mb-3">
                         <label class="form-label fw-semibold">
-                            <i class="bi bi-grid text-primary"></i> New Rack <span class="text-danger">*</span>
+                            <i class="bi bi-building text-primary"></i> New Wall <span class="text-danger">*</span>
                         </label>
-                        {{ form.new_rack }}
+                        {{ form.new_wall }}
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">
-                            <i class="bi bi-layers text-info"></i> New Shelf
+                            <i class="bi bi-grid-3x3 text-info"></i> New Rack
                         </label>
-                        {{ form.new_shelf }}
-                        <small class="text-muted">Select a rack first</small>
+                        {{ form.new_rack }}
+                        <small class="text-muted">Select a wall first</small>
                     </div>
                     <div class="mb-4">
                         <label class="form-label fw-semibold">Reason / Notes</label>
@@ -68,31 +68,31 @@
 
 {% block extra_js %}
 <script>
+const wallSelect = document.getElementById('id_new_wall');
 const rackSelect = document.getElementById('id_new_rack');
-const shelfSelect = document.getElementById('id_new_shelf');
 
-rackSelect.addEventListener('change', function() {
-    const rackId = this.value;
-    shelfSelect.innerHTML = '<option value="">Loading...</option>';
-    shelfSelect.disabled = true;
+wallSelect.addEventListener('change', function() {
+    const wallId = this.value;
+    rackSelect.innerHTML = '<option value="">Loading...</option>';
+    rackSelect.disabled = true;
 
-    if (!rackId) {
-        shelfSelect.innerHTML = '<option value="">— Select Shelf —</option>';
-        shelfSelect.disabled = false;
+    if (!wallId) {
+        rackSelect.innerHTML = '<option value="">— Select Rack —</option>';
+        rackSelect.disabled = false;
         return;
     }
 
-    fetch(`/racks/api/shelves/${rackId}/`)
+    fetch(`/racks/api/shelves/${wallId}/`)
         .then(r => r.json())
         .then(data => {
-            shelfSelect.innerHTML = '<option value="">— Select Shelf —</option>';
+            rackSelect.innerHTML = '<option value="">— Select Rack —</option>';
             data.shelves.forEach(s => {
                 const opt = document.createElement('option');
                 opt.value = s.id;
                 opt.textContent = s.code;
-                shelfSelect.appendChild(opt);
+                rackSelect.appendChild(opt);
             });
-            shelfSelect.disabled = false;
+            rackSelect.disabled = false;
         });
 });
 </script>

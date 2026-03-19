@@ -32,27 +32,27 @@
                     </div>
                 </div>
 
-                <!-- Location Display — Primary Info -->
+                <!-- Location Display -->
                 <div class="location-hero mt-4 p-4 rounded-3 bg-dark text-white">
                     <div class="row text-center g-3">
                         <div class="col-6">
                             <div class="location-block">
-                                <i class="bi bi-grid-3x3 text-warning d-block" style="font-size:2rem;"></i>
-                                <div class="small text-muted mt-1">Rack</div>
+                                <i class="bi bi-building text-warning d-block" style="font-size:2rem;"></i>
+                                <div class="small text-muted mt-1">Wall</div>
                                 <div class="display-6 fw-bold text-warning">
-                                    {{ product.rack.name|default:"—" }}
+                                    {{ product.wall.name|default:"—" }}
                                 </div>
-                                {% if product.rack.category %}
-                                <small class="text-muted">{{ product.rack.category }}</small>
+                                {% if product.wall.category %}
+                                <small class="text-muted">{{ product.wall.category }}</small>
                                 {% endif %}
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="location-block">
-                                <i class="bi bi-layers text-info d-block" style="font-size:2rem;"></i>
-                                <div class="small text-muted mt-1">Shelf</div>
+                                <i class="bi bi-grid-3x3 text-info d-block" style="font-size:2rem;"></i>
+                                <div class="small text-muted mt-1">Rack</div>
                                 <div class="display-6 fw-bold text-info">
-                                    {{ product.shelf.code|default:"—" }}
+                                    {{ product.rack.code|default:"—" }}
                                 </div>
                             </div>
                         </div>
@@ -75,7 +75,6 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <!-- Quick quantity update -->
                         <form action="{% url 'update_quantity' product.pk %}" method="post" class="d-flex gap-2 align-items-end h-100">
                             {% csrf_token %}
                             <div class="flex-grow-1">
@@ -103,7 +102,7 @@
             </div>
         </div>
 
-        <!-- Movement History for this product -->
+        <!-- Movement History -->
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
                 <h6 class="fw-bold mb-0"><i class="bi bi-clock-history"></i> Movement History</h6>
@@ -159,18 +158,18 @@
             </div>
             <div class="card-body text-center">
                 <div class="location-map p-3">
-                    {% if product.rack %}
+                    {% if product.wall %}
                     <div class="rack-visual">
-                        <div class="rack-name-big">Rack {{ product.rack.name }}</div>
-                        {% if product.rack.category %}
-                        <small class="text-muted">{{ product.rack.category }}</small>
+                        <div class="rack-name-big">Wall {{ product.wall.name }}</div>
+                        {% if product.wall.category %}
+                        <small class="text-muted">{{ product.wall.category }}</small>
                         {% endif %}
                         <div class="shelf-list mt-3">
-                            {% for shelf in product.rack.shelves.all %}
-                            <div class="shelf-row {% if shelf == product.shelf %}active-shelf{% endif %}">
-                                <i class="bi bi-{% if shelf == product.shelf %}arrow-right-circle-fill text-warning{% else %}dash{% endif %}"></i>
-                                {{ shelf.code }}
-                                {% if shelf == product.shelf %}
+                            {% for r in product.wall.racks.all %}
+                            <div class="shelf-row {% if r == product.rack %}active-shelf{% endif %}">
+                                <i class="bi bi-{% if r == product.rack %}arrow-right-circle-fill text-warning{% else %}dash{% endif %}"></i>
+                                {{ r.code }}
+                                {% if r == product.rack %}
                                 <span class="badge bg-warning text-dark ms-1">HERE</span>
                                 {% endif %}
                             </div>
@@ -190,7 +189,7 @@
 
         <div class="d-grid gap-2">
             <a href="{% url 'product_move' product.pk %}" class="btn btn-warning">
-                <i class="bi bi-arrow-left-right"></i> Move to Another Shelf
+                <i class="bi bi-arrow-left-right"></i> Move to Another Rack
             </a>
             <a href="{% url 'product_edit' product.pk %}" class="btn btn-outline-primary">
                 <i class="bi bi-pencil"></i> Edit Product Details

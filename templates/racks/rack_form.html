@@ -3,58 +3,49 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-5">
+    <div class="col-lg-6">
         <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <nav aria-label="breadcrumb" class="mb-3">
-                    <ol class="breadcrumb small">
-                        <li class="breadcrumb-item"><a href="{% url 'rack_list' %}">Racks</a></li>
-                        <li class="breadcrumb-item active">{{ title }}</li>
+            <div class="card-header bg-dark text-white py-3 px-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb small mb-0">
+                        <li class="breadcrumb-item"><a href="{% url 'wall_list' %}" class="text-warning">Wall Manager</a></li>
+                        <li class="breadcrumb-item active text-white">{{ title }}</li>
                     </ol>
                 </nav>
-                <h5 class="fw-bold mb-4">{{ title }}</h5>
-
+                <h5 class="fw-bold mt-2 mb-0">
+                    <i class="bi bi-grid-plus me-2 text-warning"></i>{{ title }}
+                </h5>
+            </div>
+            <div class="card-body p-4">
                 <form method="post">
                     {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Rack Name <span class="text-danger">*</span></label>
-                        {{ form.name }}
-                        <small class="text-muted">Single letter like A, B, C — will be auto-uppercased</small>
-                        {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors }}</div>{% endif %}
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Wall <span class="text-danger">*</span></label>
+                            {{ form.wall }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Rack Code <span class="text-danger">*</span></label>
+                            {{ form.code }}
+                            {% if form.code.errors %}<div class="text-danger small">{{ form.code.errors }}</div>{% endif %}
+                            <small class="text-muted">e.g. A1, A2, B5</small>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">Description</label>
+                            {{ form.description }}
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Category</label>
-                        {{ form.category }}
-                        <small class="text-muted">e.g. Lipsticks, Foundations, Hair Products</small>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">Description</label>
-                        {{ form.description }}
-                    </div>
+                    <hr class="my-4">
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg px-5">
-                            <i class="bi bi-check-lg"></i> Save
+                        <button type="submit" class="btn btn-success btn-lg px-5">
+                            <i class="bi bi-check-lg"></i>
+                            {% if rack %}Save Changes{% else %}Add Rack{% endif %}
                         </button>
-                        <a href="{% url 'rack_list' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                        <a href="{% url 'wall_list' %}" class="btn btn-outline-secondary btn-lg px-4">Cancel</a>
                     </div>
                 </form>
             </div>
         </div>
-
-        {% if not rack %}
-        <div class="card border-0 shadow-sm mt-3">
-            <div class="card-body p-3">
-                <small class="text-muted fw-semibold d-block mb-2">EXAMPLE RACK SETUP</small>
-                <div class="d-flex flex-wrap gap-2">
-                    {% for name, cat in examples %}
-                    <span class="badge bg-light text-dark border">{{ name }} — {{ cat }}</span>
-                    {% empty %}
-                    <span class="text-muted small">A → Lipsticks &nbsp; B → Foundations &nbsp; C → Face Cream</span>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

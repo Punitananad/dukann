@@ -41,14 +41,14 @@
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                    <i class="bi bi-archive"></i> Racks
+                    <i class="bi bi-building"></i> Walls & Racks
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark">
-                    <li><a class="dropdown-item" href="{% url 'rack_list' %}">
-                        <i class="bi bi-grid"></i> Rack Manager
+                    <li><a class="dropdown-item" href="{% url 'wall_list' %}">
+                        <i class="bi bi-building"></i> Wall Manager
                     </a></li>
-                    <li><a class="dropdown-item" href="{% url 'shelf_list' %}">
-                        <i class="bi bi-layers"></i> Shelf Manager
+                    <li><a class="dropdown-item" href="{% url 'wall_add' %}">
+                        <i class="bi bi-building-add"></i> Add Wall
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="{% url 'label_generator' %}">

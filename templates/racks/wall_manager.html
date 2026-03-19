@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% block title %}Wall Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="fw-bold mb-0">
+        <i class="bi bi-building text-primary"></i> Wall Manager
+    </h5>
+    <div class="d-flex gap-2">
+        <a href="{% url 'wall_add' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Add Wall
+        </a>
+        <a href="{% url 'label_generator' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-printer"></i> Print Labels
+        </a>
+    </div>
+</div>
+
+{% if walls %}
+<div class="d-flex flex-column gap-4">
+    {% for wall in walls %}
+    <div class="wall-container card border-0 shadow-sm" id="wall-{{ wall.pk }}">
+        <!-- Wall Header -->
+        <div class="card-header wall-header d-flex justify-content-between align-items-center py-3 px-4">
+            <div class="d-flex align-items-center gap-3">
+                <div class="wall-badge-xl">{{ wall.name }}</div>
+                <div>
+                    <div class="fw-bold fs-5">
+                        {% if wall.category %}{{ wall.category }}{% else %}Wall {{ wall.name }}{% endif %}
+                    </div>
+                    {% if wall.description %}
+                    <small class="text-muted">{{ wall.description }}</small>
+                    {% endif %}
+                    <div class="mt-1">
+                        <span class="badge bg-primary-subtle text-primary me-2">
+                            <i class="bi bi-grid-3x3"></i> {{ wall.rack_count }} rack{{ wall.rack_count|pluralize }}
+                        </span>
+                        <span class="badge bg-success-subtle text-success">
+                            <i class="bi bi-box-seam"></i> {{ wall.product_count }} product{{ wall.product_count|pluralize }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'rack_add' %}?wall={{ wall.pk }}" class="btn btn-sm btn-success" title="Add rack to this wall">
+                    <i class="bi bi-plus-lg"></i> Add Rack
+                </a>
+                <a href="{% url 'rack_bulk_add' %}?wall={{ wall.pk }}" class="btn btn-sm btn-outline-primary" title="Bulk add racks">
+                    <i class="bi bi-grid-plus"></i> Bulk Add
+                </a>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'wall_edit' wall.pk %}">
+                            <i class="bi bi-pencil"></i> Edit Wall
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'wall_delete' wall.pk %}">
+                            <i class="bi bi-trash"></i> Delete Wall
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rack Grid — Visual representation -->
+        <div class="card-body px-4 py-3">
+            {% if wall.racks.all %}
+            <div class="rack-grid">
+                {% for rack in wall.racks.all %}
+                <div class="rack-slot {% if rack.product_count > 0 %}rack-slot-occupied{% endif %}" title="Rack {{ rack.code }} — {{ rack.product_count }} product(s){% if rack.description %} — {{ rack.description }}{% endif %}">
+                    <div class="rack-slot-body">
+                        <div class="rack-slot-code">{{ rack.code }}</div>
+                        {% if rack.product_count > 0 %}
+                        <div class="rack-slot-count">{{ rack.product_count }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="rack-slot-actions">
+                        <a href="{% url 'rack_edit' rack.pk %}" class="rack-action-btn" title="Edit rack">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <a href="{% url 'rack_delete' rack.pk %}" class="rack-action-btn rack-action-danger" title="Delete rack">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Add-rack slot always shown at the end -->
+                <a href="{% url 'rack_add' %}?wall={{ wall.pk }}" class="rack-slot rack-slot-add" title="Add new rack">
+                    <div class="rack-slot-body">
+                        <i class="bi bi-plus-lg" style="font-size:1.4rem;"></i>
+                    </div>
+                </a>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="bi bi-grid" style="font-size:3rem; color:#ccc;"></i>
+                <p class="text-muted mt-2 mb-3">No racks on this wall yet</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="{% url 'rack_add' %}?wall={{ wall.pk }}" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-plus"></i> Add Single Rack
+                    </a>
+                    <a href="{% url 'rack_bulk_add' %}?wall={{ wall.pk }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-grid-plus"></i> Add Multiple Racks
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="text-center py-5">
+    <i class="bi bi-building" style="font-size:5rem; color:#ccc;"></i>
+    <h5 class="mt-4 text-muted">No walls yet</h5>
+    <p class="text-muted">Create your first wall and add racks to start organizing products</p>
+    <a href="{% url 'wall_add' %}" class="btn btn-primary btn-lg mt-2">
+        <i class="bi bi-plus-circle"></i> Add Your First Wall
+    </a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<style>
+/* ── Wall container ────────────────────────────────────── */
+.wall-container { border-radius: 12px; overflow: hidden; }
+
+.wall-header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+}
+.wall-header .text-muted { color: #adb5bd !important; }
+
+.wall-badge-xl {
+    width: 56px; height: 56px;
+    border-radius: 12px;
+    background: #f59e0b;
+    color: #1a1a2e;
+    font-size: 1.6rem;
+    font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(245,158,11,.4);
+}
+
+/* ── Rack grid ─────────────────────────────────────────── */
+.rack-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 4px 0;
+}
+
+.rack-slot {
+    position: relative;
+    width: 80px;
+    height: 90px;
+    border-radius: 10px;
+    border: 2px solid #dee2e6;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.rack-slot:hover {
+    border-color: #0d6efd;
+    background: #e7f1ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13,110,253,.18);
+}
+
+.rack-slot-occupied {
+    border-color: #198754;
+    background: #d1e7dd;
+}
+.rack-slot-occupied:hover {
+    border-color: #0a3622;
+    background: #a3cfbb;
+}
+
+.rack-slot-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px;
+}
+
+.rack-slot-code {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #212529;
+    letter-spacing: 0.5px;
+}
+
+.rack-slot-count {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #198754;
+    background: #c3e6cb;
+    border-radius: 20px;
+    padding: 1px 7px;
+}
+
+/* Hover overlay with edit/delete */
+.rack-slot-actions {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    display: flex;
+    background: rgba(0,0,0,0.72);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    justify-content: center;
+    gap: 4px;
+    padding: 5px 2px;
+}
+
+.rack-slot:hover .rack-slot-actions { opacity: 1; }
+
+.rack-action-btn {
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 3px 7px;
+    border-radius: 4px;
+    text-decoration: none;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    transition: background 0.1s;
+}
+.rack-action-btn:hover { background: rgba(255,255,255,0.3); color: #fff; }
+.rack-action-danger:hover { background: rgba(220,53,69,0.7); }
+
+/* Add-rack slot */
+.rack-slot-add {
+    border: 2px dashed #adb5bd;
+    background: #fff;
+    color: #adb5bd;
+}
+.rack-slot-add:hover {
+    border-color: #198754;
+    background: #d1e7dd;
+    color: #198754;
+    border-style: solid;
+}
+</style>
+{% endblock %}

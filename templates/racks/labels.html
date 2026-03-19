@@ -12,62 +12,62 @@
             <button onclick="window.print()" class="btn btn-primary">
                 <i class="bi bi-printer"></i> Print Labels
             </button>
-            <a href="{% url 'rack_list' %}" class="btn btn-outline-secondary">Back</a>
+            <a href="{% url 'wall_list' %}" class="btn btn-outline-secondary">Back</a>
         </div>
     </div>
 
     <!-- Filter -->
     <div class="mt-3 d-flex gap-2 flex-wrap">
-        <a href="{% url 'label_generator' %}" class="btn btn-sm {% if not rack_id %}btn-dark{% else %}btn-outline-secondary{% endif %}">
-            All Racks
+        <a href="{% url 'label_generator' %}" class="btn btn-sm {% if not wall_id %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+            All Walls
         </a>
-        {% for rack in racks %}
-        <a href="{% url 'label_generator' %}?rack={{ rack.pk }}"
-           class="btn btn-sm {% if rack_id == rack.pk|stringformat:'s' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-            Rack {{ rack.name }}
+        {% for wall in walls %}
+        <a href="{% url 'label_generator' %}?wall={{ wall.pk }}"
+           class="btn btn-sm {% if wall_id == wall.pk|stringformat:'s' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            Wall {{ wall.name }}
         </a>
         {% endfor %}
     </div>
 
     <div class="mt-3 p-3 bg-light rounded-2 small text-muted">
         <i class="bi bi-info-circle"></i>
-        Select a rack to filter, then click Print. Labels are designed for A4 paper — 4 per row.
+        Select a wall to filter, then click Print. Labels are designed for A4 paper — 4 per row.
     </div>
 </div>
 
-<!-- Print Title (only shows on print) -->
+<!-- Print Title -->
 <div class="d-none d-print-block mb-3">
-    <h4 class="fw-bold">Rack Labels — Cosmetic Shop</h4>
+    <h4 class="fw-bold">Rack Labels — Shop</h4>
     <small>Printed on {% now "d M Y H:i" %}</small>
     <hr>
 </div>
 
 <!-- Labels Grid -->
-{% for rack in selected_racks %}
+{% for wall in selected_walls %}
 <div class="mb-4">
     <h6 class="text-muted d-print-none mb-2">
-        <i class="bi bi-grid"></i> Rack {{ rack.name }}
-        {% if rack.category %} — {{ rack.category }}{% endif %}
+        <i class="bi bi-building"></i> Wall {{ wall.name }}
+        {% if wall.category %} — {{ wall.category }}{% endif %}
     </h6>
     <div class="labels-grid">
-        {% for shelf in rack.shelves.all %}
+        {% for rack in wall.racks.all %}
         <div class="label-card">
-            <div class="label-rack">RACK {{ rack.name }}</div>
-            <div class="label-shelf-code">{{ shelf.code }}</div>
-            {% if rack.category %}
-            <div class="label-category">{{ rack.category }}</div>
+            <div class="label-rack">WALL {{ wall.name }}</div>
+            <div class="label-shelf-code">{{ rack.code }}</div>
+            {% if wall.category %}
+            <div class="label-category">{{ wall.category }}</div>
             {% endif %}
             <div class="label-border-bottom"></div>
         </div>
         {% empty %}
-        <p class="text-muted small d-print-none">No shelves in Rack {{ rack.name }}</p>
+        <p class="text-muted small d-print-none">No racks on Wall {{ wall.name }}</p>
         {% endfor %}
     </div>
 </div>
 {% empty %}
 <div class="text-center py-5 text-muted d-print-none">
     <i class="bi bi-printer" style="font-size:3rem; color:#ccc;"></i>
-    <p class="mt-2">No racks to show. <a href="{% url 'rack_add' %}">Add a rack first</a>.</p>
+    <p class="mt-2">No walls to show. <a href="{% url 'wall_add' %}">Add a wall first</a>.</p>
 </div>
 {% endfor %}
 {% endblock %}

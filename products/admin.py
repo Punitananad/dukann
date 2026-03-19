@@ -11,12 +11,19 @@ class MovementLogInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'brand', 'category', 'rack', 'shelf', 'quantity', 'stock_status', 'updated_at']
-    list_filter = ['rack', 'category', 'brand']
-    search_fields = ['name', 'brand', 'category']
+    list_display = ['name', 'category', 'subcategory', 'wall', 'rack', 'quantity', 'stock_status', 'updated_at']
+    list_filter = ['wall', 'category']
+    search_fields = ['name', 'category', 'subcategory', 'tags', 'search_keywords']
     list_editable = ['quantity']
     inlines = [MovementLogInline]
     readonly_fields = ['created_at', 'updated_at']
+    fieldsets = [
+        (None, {'fields': ['name', 'category', 'subcategory']}),
+        ('Search', {'fields': ['tags', 'search_keywords'], 'classes': ['collapse']}),
+        ('Location', {'fields': ['wall', 'rack']}),
+        ('Stock', {'fields': ['quantity', 'notes']}),
+        ('Meta', {'fields': ['created_at', 'updated_at'], 'classes': ['collapse']}),
+    ]
 
 
 @admin.register(MovementLog)

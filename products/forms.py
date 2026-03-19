@@ -1,29 +1,41 @@
 from django import forms
 from .models import Product
-from racks.models import Rack, Shelf
+from racks.models import Wall, Rack
 
 
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'brand', 'rack', 'shelf', 'notes']
+        fields = ['name', 'category', 'subcategory', 'tags', 'search_keywords', 'wall', 'rack', 'notes']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control form-control-lg',
                 'placeholder': 'e.g. Lipstick Ruby',
                 'autofocus': True,
             }),
-            'brand': forms.TextInput(attrs={
+            'category': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'e.g. Lakme, Maybelline',
+                'placeholder': 'e.g. Makeup, Skincare, Hair',
+            }),
+            'subcategory': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Lip Liner, BB Cream, Anti-Aging',
+            }),
+            'tags': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. matte, waterproof, spf',
+            }),
+            'search_keywords': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. face wash cleanser oily skin',
+            }),
+            'wall': forms.Select(attrs={
+                'class': 'form-select',
+                'id': 'id_wall',
             }),
             'rack': forms.Select(attrs={
                 'class': 'form-select',
                 'id': 'id_rack',
-            }),
-            'shelf': forms.Select(attrs={
-                'class': 'form-select',
-                'id': 'id_shelf',
             }),
             'notes': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -34,32 +46,31 @@ class ProductForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['wall'].empty_label = '— Select Wall —'
         self.fields['rack'].empty_label = '— Select Rack —'
-        self.fields['shelf'].empty_label = '— Select Shelf —'
+        self.fields['wall'].required = False
         self.fields['rack'].required = False
-        self.fields['shelf'].required = False
-        # Filter shelves based on selected rack
-        rack_id = None
-        if self.instance.pk and self.instance.rack:
-            rack_id = self.instance.rack.pk
-        elif self.data.get('rack'):
-            rack_id = self.data.get('rack')
-        if rack_id:
-            self.fields['shelf'].queryset = Shelf.objects.filter(rack_id=rack_id)
+        wall_id = None
+        if self.instance.pk and self.instance.wall:
+            wall_id = self.instance.wall.pk
+        elif self.data.get('wall'):
+            wall_id = self.data.get('wall')
+        if wall_id:
+            self.fields['rack'].queryset = Rack.objects.filter(wall_id=wall_id)
         else:
-            self.fields['shelf'].queryset = Shelf.objects.none()
+            self.fields['rack'].queryset = Rack.objects.none()
 
 
 class MoveProductForm(forms.Form):
+    new_wall = forms.ModelChoiceField(
+        queryset=Wall.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-select form-select-lg', 'id': 'id_new_wall'}),
+        label='New Wall',
+    )
     new_rack = forms.ModelChoiceField(
-        queryset=Rack.objects.all(),
+        queryset=Rack.objects.none(),
         widget=forms.Select(attrs={'class': 'form-select form-select-lg', 'id': 'id_new_rack'}),
         label='New Rack',
-    )
-    new_shelf = forms.ModelChoiceField(
-        queryset=Shelf.objects.none(),
-        widget=forms.Select(attrs={'class': 'form-select form-select-lg', 'id': 'id_new_shelf'}),
-        label='New Shelf',
         required=False,
     )
     notes = forms.CharField(
@@ -71,12 +82,12 @@ class MoveProductForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        rack_id = kwargs.pop('rack_id', None)
+        wall_id = kwargs.pop('wall_id', None)
         super().__init__(*args, **kwargs)
-        if rack_id:
-            self.fields['new_shelf'].queryset = Shelf.objects.filter(rack_id=rack_id)
+        if wall_id:
+            self.fields['new_rack'].queryset = Rack.objects.filter(wall_id=wall_id)
+        self.fields['new_wall'].empty_label = '— Select Wall —'
         self.fields['new_rack'].empty_label = '— Select Rack —'
-        self.fields['new_shelf'].empty_label = '— Select Shelf —'
 
 
 class QuickQuantityForm(forms.Form):

@@ -49,18 +49,9 @@ function initLiveSearch(inputId, dropdownId) {
                         item.href = p.url;
                         item.className = 'suggestion-item';
 
-                        let stockBadge = '';
-                        if (p.stock_status === 'out') {
-                            stockBadge = '<span class="badge bg-danger ms-1" style="font-size:0.65rem;">Out</span>';
-                        } else if (p.stock_status === 'low') {
-                            stockBadge = `<span class="badge bg-warning text-dark ms-1" style="font-size:0.65rem;">Low: ${p.quantity}</span>`;
-                        } else {
-                            stockBadge = `<span class="badge bg-success ms-1" style="font-size:0.65rem;">${p.quantity}</span>`;
-                        }
-
                         let locationHtml = '';
                         if (p.rack) {
-                            locationHtml = `<span class="suggestion-rack">Rack ${p.rack}</span>`;
+                            locationHtml = `<span class="suggestion-rack">Wall ${p.rack}</span>`;
                             if (p.shelf) {
                                 locationHtml += `<span class="suggestion-shelf">${p.shelf}</span>`;
                             }
@@ -71,12 +62,11 @@ function initLiveSearch(inputId, dropdownId) {
                         item.innerHTML = `
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="fw-semibold">${p.brand} ${p.name}</span>
+                                    <span class="fw-semibold">${p.name}</span>
                                     <small class="text-muted ms-1">${p.category}</small>
                                 </div>
                                 <div class="d-flex align-items-center gap-1">
                                     ${locationHtml}
-                                    ${stockBadge}
                                 </div>
                             </div>`;
 

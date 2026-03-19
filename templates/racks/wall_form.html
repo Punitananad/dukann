@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-dark text-white py-4 px-4">
+                <h5 class="fw-bold mb-0">
+                    <i class="bi bi-building-add me-2 text-warning"></i>{{ title }}
+                </h5>
+                <small class="text-muted">Add a wall and optionally create all its racks at once</small>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" id="wallForm">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <!-- Wall Name -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">
+                                Wall Name <span class="text-danger">*</span>
+                            </label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                            <div class="text-danger small">{{ form.name.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">e.g. A, B or "North"</small>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">Category</label>
+                            {{ form.category }}
+                            <small class="text-muted">e.g. Lipsticks, Foundations</small>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Description</label>
+                            {{ form.description }}
+                        </div>
+
+                        <!-- Rack count slider -->
+                        <div class="col-12">
+                            <hr class="my-2">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-grid-3x3 text-primary me-1"></i>
+                                How many racks on this wall?
+                            </label>
+                            <div class="d-flex align-items-center gap-3">
+                                <input type="range" class="form-range flex-grow-1"
+                                       id="rackSlider" min="0" max="50" value="0"
+                                       oninput="syncCount(this.value)">
+                                <div class="input-group" style="width:110px;">
+                                    {{ form.rack_count }}
+                                </div>
+                            </div>
+                            <div id="rackPreview" class="mt-3 d-flex flex-wrap gap-1"></div>
+                            <small class="text-muted">
+                                Set to 0 to add racks manually later. Racks will be named <strong id="rackNamePreview">{{ form.name.value|upper|default:"A" }}1</strong>, <strong id="rackNamePreview2">{{ form.name.value|upper|default:"A" }}2</strong>…
+                            </small>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <div class="d-flex gap-2 align-items-center">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold">
+                            <i class="bi bi-building-add me-2"></i>Create Wall
+                        </button>
+                        <a href="{% url 'wall_list' %}" class="btn btn-outline-secondary btn-lg px-4">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const countInput = document.getElementById('id_rack_count');
+const slider = document.getElementById('rackSlider');
+const preview = document.getElementById('rackPreview');
+const nameInput = document.getElementById('id_name');
+
+function getWallName() {
+    return (nameInput.value || 'A').toUpperCase();
+}
+
+function syncCount(val) {
+    countInput.value = val;
+    slider.value = val;
+    renderPreview(parseInt(val) || 0);
+}
+
+function renderPreview(count) {
+    const name = getWallName();
+    document.getElementById('rackNamePreview').textContent = name + '1';
+    document.getElementById('rackNamePreview2').textContent = name + '2';
+    preview.innerHTML = '';
+    const show = Math.min(count, 30);
+    for (let i = 1; i <= show; i++) {
+        const chip = document.createElement('span');
+        chip.className = 'badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1';
+        chip.style.fontSize = '0.85rem';
+        chip.textContent = name + i;
+        preview.appendChild(chip);
+    }
+    if (count > 30) {
+        const more = document.createElement('span');
+        more.className = 'badge bg-secondary-subtle text-secondary px-2 py-1';
+        more.textContent = `+${count - 30} more`;
+        preview.appendChild(more);
+    }
+}
+
+countInput.addEventListener('input', function() {
+    syncCount(this.value);
+});
+slider.addEventListener('input', function() {
+    syncCount(this.value);
+});
+nameInput.addEventListener('input', function() {
+    renderPreview(parseInt(countInput.value) || 0);
+});
+
+// Initial render
+renderPreview(0);
+</script>
+{% endblock %}

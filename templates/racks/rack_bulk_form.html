@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Bulk Add Racks{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-dark text-white py-3 px-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb small mb-0">
+                        <li class="breadcrumb-item"><a href="{% url 'wall_list' %}" class="text-warning">Wall Manager</a></li>
+                        <li class="breadcrumb-item active text-white">Bulk Add Racks</li>
+                    </ol>
+                </nav>
+                <h5 class="fw-bold mt-2 mb-0">
+                    <i class="bi bi-grid-plus me-2 text-warning"></i>Bulk Add Racks
+                </h5>
+                <small class="text-muted">Automatically creates A1, A2, A3… for the selected wall. Existing racks are skipped.</small>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" id="bulkForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Wall <span class="text-danger">*</span></label>
+                        {{ form.wall }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ form.count.label }}</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <input type="range" class="form-range flex-grow-1"
+                                   id="bulkSlider" min="1" max="50" value="4"
+                                   oninput="syncBulk(this.value)">
+                            <div class="input-group" style="width:110px;">
+                                {{ form.count }}
+                            </div>
+                        </div>
+                        <div id="bulkPreview" class="mt-2 d-flex flex-wrap gap-1"></div>
+                    </div>
+                    <hr class="my-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success btn-lg px-5">
+                            <i class="bi bi-grid-plus"></i> Create Racks
+                        </button>
+                        <a href="{% url 'wall_list' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const countInput = document.getElementById('id_count');
+const slider = document.getElementById('bulkSlider');
+const preview = document.getElementById('bulkPreview');
+const wallSelect = document.getElementById('id_wall');
+
+function getWallName() {
+    const opt = wallSelect.options[wallSelect.selectedIndex];
+    return opt ? opt.text.replace('Wall ', '').trim() : '?';
+}
+
+function syncBulk(val) {
+    countInput.value = val;
+    slider.value = val;
+    renderPreview(parseInt(val) || 1);
+}
+
+function renderPreview(count) {
+    const name = getWallName();
+    preview.innerHTML = '';
+    const show = Math.min(count, 30);
+    for (let i = 1; i <= show; i++) {
+        const chip = document.createElement('span');
+        chip.className = 'badge bg-success-subtle text-success border border-success-subtle px-2 py-1';
+        chip.style.fontSize = '0.82rem';
+        chip.textContent = name + i;
+        preview.appendChild(chip);
+    }
+    if (count > 30) {
+        const more = document.createElement('span');
+        more.className = 'badge bg-secondary-subtle text-secondary px-2 py-1';
+        more.textContent = `+${count - 30} more`;
+        preview.appendChild(more);
+    }
+}
+
+countInput.addEventListener('input', function() { syncBulk(this.value); });
+slider.addEventListener('input', function() { syncBulk(this.value); });
+wallSelect.addEventListener('change', function() { renderPreview(parseInt(countInput.value) || 1); });
+
+syncBulk(countInput.value || 4);
+</script>
+{% endblock %}

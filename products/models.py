@@ -1,18 +1,24 @@
 from django.db import models
 from django.contrib.auth.models import User
-from racks.models import Rack, Shelf
+from racks.models import Wall, Rack
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=200)
-    brand = models.CharField(max_length=100)
-    category = models.CharField(max_length=100, blank=True)
-    rack = models.ForeignKey(
-        Rack, on_delete=models.SET_NULL,
+    name = models.CharField(max_length=200, db_index=True)
+    brand = models.CharField(max_length=100, blank=True, default='', db_index=True)
+    category = models.CharField(max_length=100, blank=True, db_index=True)
+    subcategory = models.CharField(max_length=100, blank=True,
+                                   help_text='e.g. Lip Liner, BB Cream, Anti-Aging')
+    tags = models.TextField(blank=True,
+                            help_text='Comma-separated keywords, e.g. matte, waterproof, spf')
+    search_keywords = models.TextField(blank=True,
+                                       help_text='Extra search terms, e.g. face wash cleanser oily skin')
+    wall = models.ForeignKey(
+        Wall, on_delete=models.SET_NULL,
         null=True, blank=True, related_name='products'
     )
-    shelf = models.ForeignKey(
-        Shelf, on_delete=models.SET_NULL,
+    rack = models.ForeignKey(
+        Rack, on_delete=models.SET_NULL,
         null=True, blank=True, related_name='products'
     )
     quantity = models.PositiveIntegerField(default=0)
@@ -21,17 +27,17 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['brand', 'name']
+        ordering = ['name']
 
     def __str__(self):
-        return f"{self.brand} {self.name}"
+        return self.name
 
     @property
     def location_display(self):
-        if self.rack and self.shelf:
-            return f"Rack {self.rack.name} / Shelf {self.shelf.code}"
-        if self.rack:
-            return f"Rack {self.rack.name}"
+        if self.wall and self.rack:
+            return f"Wall {self.wall.name} / Rack {self.rack.code}"
+        if self.wall:
+            return f"Wall {self.wall.name}"
         return "No location assigned"
 
     @property
@@ -66,16 +72,16 @@ class MovementLog(models.Model):
     def from_display(self):
         parts = []
         if self.from_rack:
-            parts.append(f"Rack {self.from_rack}")
+            parts.append(f"Wall {self.from_rack}")
         if self.from_shelf:
-            parts.append(f"Shelf {self.from_shelf}")
-        return " → ".join(parts) if parts else "—"
+            parts.append(f"Rack {self.from_shelf}")
+        return " / ".join(parts) if parts else "—"
 
     @property
     def to_display(self):
         parts = []
         if self.to_rack:
-            parts.append(f"Rack {self.to_rack}")
+            parts.append(f"Wall {self.to_rack}")
         if self.to_shelf:
-            parts.append(f"Shelf {self.to_shelf}")
-        return " → ".join(parts) if parts else "—"
+            parts.append(f"Rack {self.to_shelf}")
+        return " / ".join(parts) if parts else "—"
